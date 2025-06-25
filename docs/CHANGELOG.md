@@ -8,55 +8,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-06-25
 
 ### Added
-- **Multi-Method Analysis**: Implementasi 3 metode analisis 1st tier
-  - Site Level - Voronoi: Analisis berdasarkan diagram Voronoi
-  - Sector Level - BallTree: Algoritma BallTree dengan filtering bearing
-  - Sector Level - H2H: Analisis Head-to-Head dengan deteksi facing sector
+- **Multi-Method Analysis**: Implementation of 3 methods for 1st tier analysis
+  - Site Level - Voronoi: Analysis based on Voronoi diagrams
+  - Sector Level - BallTree: BallTree algorithm with bearing filtering
+  - Sector Level - H2H: Head-to-Head analysis with facing sector detection
 
 - **Modern GUI Interface**: 
-  - Interface menggunakan DearPyGUI
-  - Multi-tab untuk berbagai metode
-  - Real-time progress indicator
+  - Interface using DearPyGUI
+  - Multi-tab for various methods
+  - Real-time progress indicators
   - Auto-open output folder
 
 - **Robust File Handling**:
-  - Support format CSV dan Excel (.xlsx)
-  - Validasi header otomatis
-  - Normalisasi data input
-  - Error handling yang comprehensive
+  - Support for CSV and Excel (.xlsx) formats
+  - Automatic header validation
+  - Input data normalization
+  - Comprehensive error handling
 
 - **Indoor Site Detection**:
-  - Deteksi otomatis site indoor (Dir 0°/360°)
-  - Special handling untuk site indoor
+  - Automatic indoor site detection (Dir 0°/360°)
+  - Special handling for indoor sites
 
 - **Advanced H2H Analysis**:
-  - Deteksi kondisi Head-to-Head
-  - Configurable beam width dan threshold
-  - Status H2H dalam output
+  - Head-to-Head condition detection
+  - Configurable beam width and threshold
+  - H2H status in output
 
 - **Professional Output**:
-  - Export hasil ke CSV dengan timestamp
+  - Export results to CSV with timestamps
   - Structured output format
-  - Distance calculation dalam kilometer
+  - Distance calculations in kilometers
 
 ### Features
-- **Authentication System**: Login handling untuk versi penuh
-- **Trial Mode**: Mode experimental hingga 30 Juni 2025
-- **Logo Integration**: Dynamic logo download dan display
+- **Authentication System**: Login handling for full version
+- **Trial Mode**: Experimental mode until June 30, 2025
+- **Logo Integration**: Dynamic logo download and display
 - **Cross-platform Support**: Windows, Linux, macOS
-- **Modern Themes**: Custom styling dan font handling
+- **Modern Themes**: Custom styling and font handling
 
 ### Technical Implementation
-- **BallTree Algorithm**: Optimized spatial search menggunakan scikit-learn
-- **Voronoi Diagrams**: Implementasi menggunakan scipy.spatial
-- **Geographic Calculations**: Akurat distance calculation menggunakan geopy
-- **Bearing Calculations**: Precise bearing computation untuk filtering
-- **Threading**: Background processing untuk UI responsiveness
+- **BallTree Algorithm**: Optimized spatial search using scikit-learn
+- **Voronoi Diagrams**: Implementation using scipy.spatial
+- **Geographic Calculations**: Accurate distance calculation using geopy
+- **Bearing Calculations**: Precise bearing computation for filtering
+- **Threading**: Background processing for UI responsiveness
 
 ### Documentation
-- Comprehensive README dengan setup instructions
-- Detailed API documentation dalam code
-- User manual dalam tab About
+- Comprehensive README with setup instructions
+- Detailed API documentation in code
+- User manual in About tab
 - Header requirements specification
 
 ### Author

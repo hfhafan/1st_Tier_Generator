@@ -1,17 +1,17 @@
 # Setup Guide - 1st Tier Generator HD
 
-Panduan lengkap untuk setup development environment dan menjalankan aplikasi.
+Complete guide for setting up development environment and running the application.
 
 ## 📋 Prerequisites
 
 ### System Requirements
-- **Python**: 3.8 atau lebih tinggi
-- **Operating System**: Windows 10/11, Linux, atau macOS
+- **Python**: 3.8 or higher
+- **Operating System**: Windows 10/11, Linux, or macOS
 - **Memory**: Minimum 4GB RAM
 - **Storage**: 500MB free space
 
 ### Required Software
-- Git (untuk clone repository)
+- Git (for cloning repository)
 - Python interpreter
 - pip (package manager)
 
@@ -19,8 +19,8 @@ Panduan lengkap untuk setup development environment dan menjalankan aplikasi.
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/1st-tier-generator-hd.git
-cd 1st-tier-generator-hd
+git clone https://github.com/hfhafan/1st_Tier_Generator.git
+cd 1st_Tier_Generator
 ```
 
 ### 2. Create Virtual Environment
@@ -49,7 +49,7 @@ python src/main.py
 ### Code Structure
 ```
 src/
-├── main.py                    # Entry point aplikasi
+├── main.py                    # Application entry point
 ├── processors/               # Core processing algorithms
 │   ├── voronoi_processor.py  # Voronoi analysis
 │   ├── balltree_processor.py # BallTree analysis
@@ -62,7 +62,7 @@ src/
 ### Key Dependencies
 
 #### Core Libraries
-- **pandas**: Data manipulation dan analysis
+- **pandas**: Data manipulation and analysis
 - **numpy**: Numerical computations
 - **scipy**: Scientific computing (Voronoi diagrams)
 - **scikit-learn**: Machine learning (BallTree)
@@ -70,11 +70,11 @@ src/
 
 #### GUI Framework
 - **dearpygui**: Modern GUI framework
-- **Pillow**: Image processing untuk logo
+- **Pillow**: Image processing for logo
 
 #### File Support
 - **openpyxl**: Excel file reading/writing
-- **requests**: HTTP requests untuk download assets
+- **requests**: HTTP requests for downloading assets
 
 ## 🏗️ Building Executable
 
@@ -96,17 +96,17 @@ pyinstaller --onefile --windowed --icon=icon.ico src/main.py
 ## 🧪 Testing
 
 ### Sample Data
-Gunakan file `assets/sample_data.csv` untuk testing:
+Use the file `assets/sample_data.csv` for testing:
 ```bash
-# Copy sample data ke lokasi test
+# Copy sample data to test location
 cp assets/sample_data.csv test_data.csv
 ```
 
 ### Test Scenarios
-1. **Voronoi Analysis**: Test dengan SITE001,SITE002,SITE003
-2. **BallTree Analysis**: Test dengan berbagai parameter
-3. **H2H Analysis**: Test deteksi facing sectors
-4. **Indoor Detection**: Test dengan INDOOR001
+1. **Voronoi Analysis**: Test with SITE001,SITE002,SITE003
+2. **BallTree Analysis**: Test with various parameters
+3. **H2H Analysis**: Test facing sector detection
+4. **Indoor Detection**: Test with INDOOR001
 
 ## 🔍 Debugging
 
@@ -114,7 +114,7 @@ cp assets/sample_data.csv test_data.csv
 
 #### 1. Import Errors
 ```bash
-# Pastikan semua dependencies terinstall
+# Ensure all dependencies are installed
 pip install -r requirements.txt
 
 # Check Python version
@@ -123,7 +123,7 @@ python --version
 
 #### 2. GUI Issues
 ```bash
-# Install tkinter jika belum ada (Linux)
+# Install tkinter if not available (Linux)
 sudo apt-get install python3-tk
 
 # Check DearPyGUI installation
@@ -131,11 +131,11 @@ pip show dearpygui
 ```
 
 #### 3. File Access Issues
-- Pastikan file input accessible dan format benar
-- Check permission folder output
+- Ensure input files are accessible and properly formatted
+- Check output folder permissions
 
 ### Debug Mode
-Tambahkan logging untuk debugging:
+Add logging for debugging:
 ```python
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -144,24 +144,24 @@ logging.basicConfig(level=logging.DEBUG)
 ## 📁 Configuration
 
 ### File Locations
-- **Input Files**: CSV/Excel dengan header yang sesuai
+- **Input Files**: CSV/Excel with proper headers
 - **Output Folder**: `~/Documents/1st_tier_generator_HD/`
 - **Temp Files**: System temporary directory
 
 ### Header Requirements
-File input harus memiliki header:
-- `Site ID`: ID unik site
-- `Sector`: ID sektor 
-- `Latitude`: Koordinat latitude
-- `Longitude`: Koordinat longitude
-- `Dir`: Azimuth sektor (0-360°)
-- `tilt`: Tilt antena (opsional)
+Input file must have headers:
+- `Site ID`: Unique site identifier
+- `Sector`: Sector ID 
+- `Latitude`: Latitude coordinate
+- `Longitude`: Longitude coordinate
+- `Dir`: Sector azimuth (0-360°)
+- `tilt`: Antenna tilt (optional)
 
 ## 🚢 Deployment
 
 ### Creating Distribution
 ```bash
-# Build dengan semua dependencies
+# Build with all dependencies
 pyinstaller --onefile --collect-all dearpygui src/main.py
 
 # Test executable
@@ -169,11 +169,11 @@ pyinstaller --onefile --collect-all dearpygui src/main.py
 ```
 
 ### Distribution Checklist
-- [ ] Test di clean environment
-- [ ] Verify semua features berfungsi
-- [ ] Check file size reasonable
-- [ ] Test dengan sample data
-- [ ] Verify output format benar
+- [ ] Test in clean environment
+- [ ] Verify all features work
+- [ ] Check reasonable file size
+- [ ] Test with sample data
+- [ ] Verify correct output format
 
 ## 🤝 Contributing
 
@@ -192,7 +192,7 @@ pyinstaller --onefile --collect-all dearpygui src/main.py
 
 ## 📞 Support
 
-Jika mengalami kesulitan dalam setup:
+If you encounter difficulties in setup:
 
 - 📧 Email: hadifauzanhanif@gmail.com
 - 💬 WhatsApp: [+62 813-5719-8294](https://wa.me/6281357198294)
@@ -200,7 +200,7 @@ Jika mengalami kesulitan dalam setup:
 
 ## 📝 Notes
 
-- Virtual environment sangat direkomendasikan
-- Test dengan data kecil terlebih dahulu
-- Backup data penting sebelum processing
-- Monitor memory usage untuk dataset besar 
+- Virtual environment is highly recommended
+- Test with small data first
+- Backup important data before processing
+- Monitor memory usage for large datasets 

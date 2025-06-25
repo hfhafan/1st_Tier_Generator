@@ -1,323 +1,363 @@
 """
-File Handler - Input/Output Operations
+File Handler Utilities for 1st Tier Generator HD
 
-Modul untuk handling operasi file input/output dalam aplikasi 1st Tier Generator.
-Mendukung format CSV dan Excel dengan validasi header yang diperlukan.
+This module provides file I/O operations for the 1st tier analysis application.
+Handles CSV/Excel file reading, data validation, and result export.
+
+Supported formats:
+- CSV files (.csv)
+- Excel files (.xlsx, .xls)
 
 Author: Hadi Fauzan Hanif
 Email: hadifauzanhanif@gmail.com
 """
 
-import os
 import pandas as pd
 import numpy as np
-from datetime import datetime
-import tempfile
-
+import os
+import datetime
+from pathlib import Path
 
 class FileHandler:
-    """Handler untuk operasi file I/O"""
+    """
+    Handler for file I/O operations in 1st tier analysis
+    
+    This class manages input file reading, data validation,
+    and output file generation for the application.
+    """
     
     def __init__(self):
-        self.required_headers = ["Site ID", "Sector", "Latitude", "Longitude", "Dir"]
-        self.optional_headers = ["tilt"]
-        self.output_base_dir = os.path.join(os.path.expanduser("~"), "Documents", "1st_tier_generator_HD")
+        self.required_headers = ['Site ID', 'Sector', 'Latitude', 'Longitude', 'Dir']
+        self.optional_headers = ['tilt', 'height', 'technology']
+        self.output_directory = self._get_output_directory()
+    
+    def _get_output_directory(self):
+        """
+        Get or create output directory for results
+        
+        Returns:
+            str: Path to output directory
+        """
+        # Create output directory in user's Documents folder
+        docs_folder = Path.home() / "Documents"
+        output_dir = docs_folder / "1st_tier_generator_HD"
+        
+        # Create directory if it doesn't exist
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        return str(output_dir)
     
     def read_file(self, filepath):
         """
-        Membaca file input (CSV/Excel):
-        1. Deteksi format file berdasarkan ekstensi
-        2. Baca file menggunakan pandas
-        3. Validasi dan normalisasi header
-        4. Return DataFrame yang telah divalidasi
+        Read input file (CSV or Excel) with proper encoding handling
         
         Args:
-            filepath: Path ke file input
+            filepath (str): Path to input file
             
         Returns:
-            pandas.DataFrame: Data yang telah divalidasi
+            DataFrame: Parsed data with standardized column names
             
         Raises:
-            ValueError: Jika format file tidak didukung atau header tidak valid
-            FileNotFoundError: Jika file tidak ditemukan
+            FileNotFoundError: If file doesn't exist
+            ValueError: If file format not supported or headers missing
+            Exception: For other file reading errors
         """
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"File not found: {filepath}")
+        
+        # Get file extension
+        file_ext = Path(filepath).suffix.lower()
+        
         try:
-            # Step 1: Validasi file exists
-            if not os.path.exists(filepath):
-                raise FileNotFoundError(f"File tidak ditemukan: {filepath}")
-            
-            # Step 2: Deteksi format dan baca file
-            file_ext = os.path.splitext(filepath)[1].lower()
-            
             if file_ext == '.csv':
-                df = pd.read_csv(filepath)
+                # Try different encodings for CSV
+                encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252']
+                df = None
+                
+                for encoding in encodings:
+                    try:
+                        df = pd.read_csv(filepath, encoding=encoding)
+                        break
+                    except UnicodeDecodeError:
+                        continue
+                
+                if df is None:
+                    raise ValueError("Unable to read CSV file with any supported encoding")
+                    
             elif file_ext in ['.xlsx', '.xls']:
-                df = pd.read_excel(filepath)
+                df = pd.read_excel(filepath, engine='openpyxl' if file_ext == '.xlsx' else 'xlrd')
             else:
-                raise ValueError(f"Format file tidak didukung: {file_ext}")
-            
-            # Step 3: Validasi dan normalisasi header
-            df = self._validate_and_normalize_headers(df)
-            
-            # Step 4: Validasi data
-            df = self._validate_data_types(df)
-            
-            return df
-            
+                raise ValueError(f"Unsupported file format: {file_ext}")
+                
         except Exception as e:
-            raise Exception(f"Error membaca file {filepath}: {str(e)}")
+            raise Exception(f"Error reading file {filepath}: {str(e)}")
+        
+        # Validate and standardize data
+        df = self._validate_and_standardize(df)
+        
+        return df
     
-    def _validate_and_normalize_headers(self, df):
+    def _validate_and_standardize(self, df):
         """
-        Validasi dan normalisasi header:
-        1. Cek apakah semua header wajib ada
-        2. Normalisasi nama header (case-insensitive)
-        3. Rename header ke format standar
-        4. Return DataFrame dengan header yang dinormalisasi
+        Validate input data and standardize column names
+        
+        Args:
+            df (DataFrame): Raw input data
+            
+        Returns:
+            DataFrame: Validated and standardized data
+            
+        Raises:
+            ValueError: If required headers are missing or data is invalid
         """
-        # Normalisasi header (case-insensitive dan trim whitespace)
-        df.columns = df.columns.str.strip()
+        if df.empty:
+            raise ValueError("Input file is empty")
         
-        # Mapping header variations ke standar
-        header_mapping = {
-            'site id': 'Site ID',
-            'siteid': 'Site ID',
-            'site_id': 'Site ID',
-            'sector': 'Sector',
-            'latitude': 'Latitude',
-            'lat': 'Latitude',
-            'longitude': 'Longitude',
-            'lon': 'Longitude',
-            'lng': 'Longitude',
-            'dir': 'Dir',
-            'direction': 'Dir',
-            'azimuth': 'Dir',
-            'tilt': 'tilt'
-        }
+        # Check for required headers (case-insensitive)
+        df_headers = [col.strip().lower() for col in df.columns]
+        required_lower = [h.lower() for h in self.required_headers]
         
-        # Rename columns based on mapping
-        df_renamed = df.rename(columns={
-            col: header_mapping.get(col.lower(), col) 
-            for col in df.columns
-        })
+        missing_headers = []
+        for required in required_lower:
+            if required not in df_headers:
+                missing_headers.append(required)
         
-        # Validasi header wajib
-        missing_headers = [h for h in self.required_headers if h not in df_renamed.columns]
         if missing_headers:
-            raise ValueError(f"Header wajib tidak ditemukan: {missing_headers}")
+            raise ValueError(f"Missing required headers: {missing_headers}")
         
-        return df_renamed
+        # Standardize column names (map to expected names)
+        column_mapping = {}
+        for col in df.columns:
+            col_lower = col.strip().lower()
+            if col_lower == 'site id':
+                column_mapping[col] = 'site_id'
+            elif col_lower == 'sector':
+                column_mapping[col] = 'sector'
+            elif col_lower == 'latitude':
+                column_mapping[col] = 'latitude'
+            elif col_lower == 'longitude':
+                column_mapping[col] = 'longitude'
+            elif col_lower == 'dir':
+                column_mapping[col] = 'azimuth'
+            elif col_lower == 'tilt':
+                column_mapping[col] = 'tilt'
+        
+        df = df.rename(columns=column_mapping)
+        
+        # Validate data types and ranges
+        df = self._validate_data_types(df)
+        
+        return df
     
     def _validate_data_types(self, df):
         """
-        Validasi dan konversi tipe data:
-        1. Konversi Site ID dan Sector ke string
-        2. Konversi Latitude, Longitude, Dir ke float
-        3. Handle missing values
-        4. Validasi range nilai (koordinat, azimuth)
-        5. Return DataFrame dengan tipe data yang benar
-        """
-        try:
-            # Konversi tipe data
-            df['Site ID'] = df['Site ID'].astype(str)
-            df['Sector'] = df['Sector'].astype(str)
-            df['Latitude'] = pd.to_numeric(df['Latitude'], errors='coerce')
-            df['Longitude'] = pd.to_numeric(df['Longitude'], errors='coerce')
-            df['Dir'] = pd.to_numeric(df['Dir'], errors='coerce')
+        Validate and convert data types
+        
+        Args:
+            df (DataFrame): Input data
             
-            # Handle tilt jika ada
+        Returns:
+            DataFrame: Data with validated types
+        """
+        # Remove rows with missing critical data
+        critical_cols = ['site_id', 'sector', 'latitude', 'longitude', 'azimuth']
+        df = df.dropna(subset=critical_cols)
+        
+        if df.empty:
+            raise ValueError("No valid data rows found after removing incomplete records")
+        
+        # Convert data types
+        try:
+            df['latitude'] = pd.to_numeric(df['latitude'], errors='coerce')
+            df['longitude'] = pd.to_numeric(df['longitude'], errors='coerce')
+            df['azimuth'] = pd.to_numeric(df['azimuth'], errors='coerce')
+            
             if 'tilt' in df.columns:
                 df['tilt'] = pd.to_numeric(df['tilt'], errors='coerce')
-            
-            # Validasi missing values untuk kolom wajib
-            required_numeric = ['Latitude', 'Longitude', 'Dir']
-            for col in required_numeric:
-                if df[col].isna().any():
-                    raise ValueError(f"Ditemukan nilai kosong pada kolom {col}")
-            
-            # Validasi range nilai
-            self._validate_coordinate_ranges(df)
-            
-            return df
-            
         except Exception as e:
-            raise ValueError(f"Error validasi data: {str(e)}")
-    
-    def _validate_coordinate_ranges(self, df):
-        """
-        Validasi range koordinat dan azimuth:
-        1. Latitude: -90 to 90
-        2. Longitude: -180 to 180  
-        3. Dir: 0 to 360
-        4. Raise error jika ada nilai di luar range
-        """
-        # Validasi Latitude
-        if not df['Latitude'].between(-90, 90).all():
-            raise ValueError("Latitude harus dalam range -90 hingga 90")
+            raise ValueError(f"Error converting numeric columns: {str(e)}")
         
-        # Validasi Longitude
-        if not df['Longitude'].between(-180, 180).all():
-            raise ValueError("Longitude harus dalam range -180 hingga 180")
+        # Remove rows with invalid coordinates or azimuth
+        df = df.dropna(subset=['latitude', 'longitude', 'azimuth'])
         
-        # Validasi Dir
-        if not df['Dir'].between(0, 360).all():
-            raise ValueError("Dir harus dalam range 0 hingga 360")
-    
-    def check_headers(self, df):
-        """
-        Fungsi tambahan untuk cek header (backward compatibility):
-        1. Validasi keberadaan header wajib
-        2. Print informasi header yang ditemukan
-        3. Return True jika valid
-        """
-        missing_headers = [h for h in self.required_headers if h not in df.columns]
+        # Validate coordinate ranges
+        invalid_coords = (
+            (df['latitude'] < -90) | (df['latitude'] > 90) |
+            (df['longitude'] < -180) | (df['longitude'] > 180)
+        )
         
-        if missing_headers:
-            print(f"Header wajib tidak ditemukan: {missing_headers}")
-            print(f"Header yang tersedia: {list(df.columns)}")
-            return False
+        if invalid_coords.any():
+            print(f"Warning: Removing {invalid_coords.sum()} rows with invalid coordinates")
+            df = df[~invalid_coords]
         
-        print(f"✓ Semua header wajib ditemukan: {self.required_headers}")
-        return True
+        # Validate azimuth range
+        invalid_azimuth = (df['azimuth'] < 0) | (df['azimuth'] > 360)
+        if invalid_azimuth.any():
+            print(f"Warning: Removing {invalid_azimuth.sum()} rows with invalid azimuth")
+            df = df[~invalid_azimuth]
+        
+        if df.empty:
+            raise ValueError("No valid data rows found after validation")
+        
+        return df
     
     def parse_data(self, df):
         """
-        Parse data ke format yang digunakan processor:
-        1. Rename kolom ke format internal
-        2. Add computed fields jika diperlukan
-        3. Return list of dictionaries atau DataFrame
+        Parse DataFrame to list of dictionaries for processing
         
         Args:
-            df: DataFrame yang sudah divalidasi
+            df (DataFrame): Validated input data
             
         Returns:
-            list: List of dictionaries dengan format standar
+            list: List of sector dictionaries
         """
-        try:
-            # Rename kolom ke format internal processor
-            df_parsed = df.rename(columns={
-                'Site ID': 'site_id',
-                'Sector': 'sector', 
-                'Latitude': 'lat',
-                'Longitude': 'lon',
-                'Dir': 'azimuth'
-            })
-            
-            # Tambah computed fields jika diperlukan
-            df_parsed['row_id'] = range(len(df_parsed))
-            
-            # Convert ke list of dictionaries
-            points = df_parsed.to_dict('records')
-            
-            return points
-            
-        except Exception as e:
-            raise Exception(f"Error parsing data: {str(e)}")
+        return df.to_dict('records')
     
     def save_result_to_csv(self, results, method_name):
         """
-        Simpan hasil analisis ke file CSV:
-        1. Buat folder output jika belum ada
-        2. Generate nama file dengan timestamp
-        3. Convert results ke DataFrame
-        4. Simpan ke CSV dengan encoding UTF-8
-        5. Return path file output
+        Save analysis results to CSV file with timestamp
         
         Args:
-            results: List of dictionaries hasil analisis
-            method_name: Nama metode untuk prefix filename
+            results (list): List of result dictionaries
+            method_name (str): Name of analysis method for filename
             
         Returns:
-            str: Path ke file output yang disimpan
+            str: Path to saved file
         """
+        if not results:
+            raise ValueError("No results to save")
+        
+        # Generate filename with timestamp
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{method_name}_Results_{timestamp}.csv"
+        filepath = os.path.join(self.output_directory, filename)
+        
+        # Convert results to DataFrame
+        df_results = pd.DataFrame(results)
+        
+        # Save to CSV
         try:
-            # Step 1: Buat folder output
-            os.makedirs(self.output_base_dir, exist_ok=True)
-            
-            # Step 2: Generate filename dengan timestamp
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{method_name}_{timestamp}.csv"
-            output_path = os.path.join(self.output_base_dir, filename)
-            
-            # Step 3: Convert results ke DataFrame
-            if not results:
-                raise ValueError("Tidak ada hasil untuk disimpan")
-            
-            df_results = pd.DataFrame(results)
-            
-            # Step 4: Simpan ke CSV
-            df_results.to_csv(output_path, index=False, encoding='utf-8-sig')
-            
-            print(f"✓ Hasil disimpan ke: {output_path}")
-            return output_path
-            
+            df_results.to_csv(filepath, index=False, encoding='utf-8-sig')
+            print(f"Results saved to: {filepath}")
+            return filepath
         except Exception as e:
-            raise Exception(f"Error menyimpan hasil: {str(e)}")
+            raise Exception(f"Error saving results: {str(e)}")
     
-    def create_sample_data(self, num_sites=10, sectors_per_site=3):
+    def get_file_info(self, filepath):
         """
-        Buat data sample untuk testing (opsional):
-        1. Generate koordinat random dalam area tertentu
-        2. Buat site ID dan sektor
-        3. Assign azimuth untuk setiap sektor
-        4. Return DataFrame sample
+        Get information about input file
         
         Args:
-            num_sites: Jumlah site yang akan dibuat
-            sectors_per_site: Jumlah sektor per site
+            filepath (str): Path to file
             
         Returns:
-            pandas.DataFrame: Sample data dengan format yang benar
+            dict: File information including size, format, etc.
         """
-        # Generate sample data
-        # Implementasi pembuatan data sample
-        pass
+        if not os.path.exists(filepath):
+            return {"error": "File not found"}
+        
+        file_path = Path(filepath)
+        file_size = file_path.stat().st_size
+        
+        # Try to read file for row count
+        try:
+            df = self.read_file(filepath)
+            row_count = len(df)
+            site_count = df['site_id'].nunique()
+            sector_count = len(df)
+        except Exception:
+            row_count = "Unknown"
+            site_count = "Unknown"  
+            sector_count = "Unknown"
+        
+        info = {
+            "filename": file_path.name,
+            "size_bytes": file_size,
+            "size_mb": round(file_size / (1024*1024), 2),
+            "format": file_path.suffix.upper(),
+            "total_sectors": sector_count,
+            "unique_sites": site_count,
+            "total_rows": row_count
+        }
+        
+        return info
     
     def validate_site_ids(self, df, site_ids_string):
         """
-        Validasi Site ID yang diinput user:
-        1. Parse string site IDs menjadi list
-        2. Cek apakah semua site ID ada dalam data
-        3. Return list site ID yang valid dan yang tidak ditemukan
+        Validate that requested site IDs exist in data
         
         Args:
-            df: DataFrame input data
-            site_ids_string: String site IDs dipisahkan koma
+            df (DataFrame): Input data
+            site_ids_string (str): Comma-separated site IDs
             
         Returns:
-            tuple: (valid_site_ids, missing_site_ids)
+            tuple: (valid_sites, invalid_sites)
         """
         # Parse site IDs
-        input_site_ids = [sid.strip() for sid in site_ids_string.split(",") if sid.strip()]
+        requested_sites = [sid.strip() for sid in site_ids_string.split(",") if sid.strip()]
         
-        # Get unique site IDs dari data
-        available_site_ids = set(df['Site ID'].unique())
+        # Get available sites
+        available_sites = set(df['site_id'].unique())
         
-        # Cek yang valid dan yang missing
-        valid_site_ids = [sid for sid in input_site_ids if sid in available_site_ids]
-        missing_site_ids = [sid for sid in input_site_ids if sid not in available_site_ids]
+        # Check which are valid
+        valid_sites = [sid for sid in requested_sites if sid in available_sites]
+        invalid_sites = [sid for sid in requested_sites if sid not in available_sites]
         
-        return valid_site_ids, missing_site_ids
+        return valid_sites, invalid_sites
     
-    def get_data_summary(self, df):
+    def export_sample_template(self):
         """
-        Generate summary statistik data input:
-        1. Jumlah site dan sektor
-        2. Range koordinat
-        3. Distribusi azimuth
-        4. Return dictionary summary
+        Export sample template file for user reference
+        
+        Returns:
+            str: Path to exported template
         """
-        summary = {
-            'total_rows': len(df),
-            'unique_sites': df['Site ID'].nunique(),
-            'unique_sectors': len(df),
-            'lat_range': (df['Latitude'].min(), df['Latitude'].max()),
-            'lon_range': (df['Longitude'].min(), df['Longitude'].max()),
-            'azimuth_stats': {
-                'min': df['Dir'].min(),
-                'max': df['Dir'].max(),
-                'mean': df['Dir'].mean()
-            }
+        # Create sample data
+        sample_data = {
+            'Site ID': ['SITE001', 'SITE001', 'SITE001', 'SITE002', 'SITE002'],
+            'Sector': ['A', 'B', 'C', 'A', 'B'],
+            'Latitude': [-6.2088, -6.2088, -6.2088, -6.2145, -6.2145],
+            'Longitude': [106.8456, 106.8456, 106.8456, 106.8523, 106.8523],
+            'Dir': [0, 120, 240, 45, 180],
+            'tilt': [5, 5, 5, 3, 3]
         }
         
-        return summary 
+        df_template = pd.DataFrame(sample_data)
+        
+        # Save template
+        template_path = os.path.join(self.output_directory, "input_template.csv")
+        df_template.to_csv(template_path, index=False)
+        
+        return template_path
+    
+    def cleanup_old_files(self, days_old=30):
+        """
+        Clean up old result files to save disk space
+        
+        Args:
+            days_old (int): Remove files older than this many days
+        """
+        try:
+            output_path = Path(self.output_directory)
+            cutoff_date = datetime.datetime.now() - datetime.timedelta(days=days_old)
+            
+            removed_count = 0
+            for file_path in output_path.glob("*Results*.csv"):
+                if file_path.stat().st_mtime < cutoff_date.timestamp():
+                    file_path.unlink()
+                    removed_count += 1
+            
+            if removed_count > 0:
+                print(f"Cleaned up {removed_count} old result files")
+                
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
+    
+    def get_output_directory(self):
+        """
+        Get the current output directory path
+        
+        Returns:
+            str: Output directory path
+        """
+        return self.output_directory 

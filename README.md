@@ -7,100 +7,100 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"/>
 </div>
 
-## 📋 Deskripsi
+## 📋 Description
 
-**1st Tier Generator HD** adalah aplikasi desktop yang dikembangkan untuk mengidentifikasi site 1st tier dalam jaringan telekomunikasi menggunakan berbagai metode analisis spasial. Aplikasi ini dirancang khusus untuk engineer telekomunikasi yang membutuhkan analisis cepat dan akurat untuk optimasi jaringan.
+**1st Tier Generator HD** is a desktop application developed for identifying 1st tier sites in telecommunications networks using various spatial analysis methods. This application is specifically designed for telecommunications engineers who need fast and accurate analysis for network optimization.
 
-## ✨ Fitur Utama
+## ✨ Key Features
 
 ### 🔄 Multi-Method Analysis
-- **Site Level - Voronoi**: Analisis berdasarkan diagram Voronoi untuk identifikasi site tetangga
-- **Sector Level - BallTree**: Algoritma BallTree dengan filtering berbasis bearing
-- **Sector Level - H2H**: Analisis Head-to-Head dengan deteksi facing sector
+- **Site Level - Voronoi**: Analysis based on Voronoi diagrams for neighboring site identification
+- **Sector Level - BallTree**: BallTree algorithm with bearing-based filtering
+- **Sector Level - H2H**: Head-to-Head analysis with facing sector detection
 
 ### 🖥️ User Interface
-- GUI modern dengan DearPyGUI
-- Interface yang user-friendly dan intuitif  
-- Multi-tab untuk berbagai metode analisis
-- Real-time status dan progress indicator
+- Modern GUI with DearPyGUI
+- User-friendly and intuitive interface
+- Multi-tab for various analysis methods
+- Real-time status and progress indicators
 
 ### 📊 Input/Output
-- Mendukung format file Excel (.xlsx) dan CSV (.csv)
-- Output hasil analisis dalam format CSV
-- Auto-open folder hasil setelah processing
+- Supports Excel (.xlsx) and CSV (.csv) file formats
+- Outputs analysis results in CSV format
+- Auto-opens output folder after processing
 
 ## 📥 Download
 
-Unduh versi executable terbaru di: **[Download 1st Tier Generator HD](http://bit.ly/4k9elX1)**
+Download the latest executable version at: **[Download 1st Tier Generator HD](http://bit.ly/4k9elX1)**
 
-> **Catatan**: File executable sudah dikompilasi dan siap digunakan tanpa instalasi Python
+> **Note**: The executable file is pre-compiled and ready to use without Python installation
 
-## 🎯 Metode Analisis
+## 🎯 Analysis Methods
 
 ### 1. Site Level - Voronoi
 ```python
-# Logika utama
+# Main logic
 def process_voronoi(sites, max_radius):
-    # 1. Buat diagram Voronoi dari koordinat site
-    # 2. Identifikasi site yang berbagi boundary
-    # 3. Cek apakah site indoor (semua sektor Dir 0°/360°)
-    # 4. Return list 1st tier sites dengan jarak
+    # 1. Create Voronoi diagram from site coordinates
+    # 2. Identify sites sharing boundaries
+    # 3. Check if site is indoor (all sectors Dir 0°/360°)
+    # 4. Return list of 1st tier sites with distances
 ```
 
-**Keunggulan:**
-- Analisis level site (bukan sektor)
-- Identifikasi otomatis site indoor
-- Hasil berdasarkan kedekatan geografis
+**Advantages:**
+- Site-level analysis (not individual sectors)
+- Automatic indoor site identification
+- Results based on geographical proximity
 
 ### 2. Sector Level - BallTree
 ```python
-# Logika utama  
+# Main logic  
 def process_balltree(sectors, candidates_per_sector, max_radius):
-    # 1. Build BallTree dari koordinat sektor
-    # 2. Query k-nearest neighbors untuk setiap sektor
-    # 3. Filter berdasarkan bearing dan Dir sektor
-    # 4. Pastikan 1st tier berbeda untuk setiap sektor
-    # 5. Return hasil per sektor dengan jarak
+    # 1. Build BallTree from sector coordinates
+    # 2. Query k-nearest neighbors for each sector
+    # 3. Filter based on bearing and sector direction
+    # 4. Ensure different 1st tier for each sector
+    # 5. Return results per sector with distances
 ```
 
-**Keunggulan:**
-- Analisis level sektor dengan presisi tinggi
-- Algoritma BallTree untuk pencarian cepat
-- Filtering berdasarkan arah sektor
+**Advantages:**
+- High-precision sector-level analysis
+- Fast BallTree algorithm for searching
+- Filtering based on sector direction
 
 ### 3. Sector Level - H2H (Head-to-Head)
 ```python
-# Logika utama
+# Main logic
 def process_facing(sectors, max_radius, beam_width, h2h_threshold):
-    # 1. Cari kandidat dalam radius menggunakan BallTree
-    # 2. Filter berdasarkan beam_width sektor
-    # 3. Hitung bearing antar sektor
-    # 4. Deteksi kondisi Head-to-Head:
-    #    - Dir sektor A dalam beam_width bearing ke B
-    #    - Dir sektor B dalam beam_width bearing ke A  
-    #    - Jarak < 1.5 km
-    # 5. Return hasil dengan status H2H
+    # 1. Find candidates within radius using BallTree
+    # 2. Filter based on sector beam_width
+    # 3. Calculate bearing between sectors
+    # 4. Detect Head-to-Head conditions:
+    #    - Sector A Dir within beam_width of bearing to B
+    #    - Sector B Dir within beam_width of bearing to A  
+    #    - Distance < 1.5 km
+    # 5. Return results with H2H status
 ```
 
-**Keunggulan:**
-- Deteksi facing sector otomatis
-- Analisis Head-to-Head dengan kriteria yang dapat disesuaikan
-- Output detail termasuk status H2H
+**Advantages:**
+- Automatic facing sector detection
+- Head-to-Head analysis with customizable criteria
+- Detailed output including H2H status
 
-## 📋 Format Input Data
+## 📋 Input Data Format
 
-File input harus berformat CSV atau Excel dengan header wajib:
+Input file must be in CSV or Excel format with required headers:
 
-| Header | Tipe | Deskripsi |
-|--------|------|-----------|
-| Site ID | String | ID unik untuk site |
-| Sector | String | ID sektor dalam site |
-| Latitude | Float | Koordinat latitude |
-| Longitude | Float | Koordinat longitude |
-| Dir | Float | Arah azimuth sektor (derajat) |
-| tilt | Float | Sudut kemiringan antena (opsional) |
+| Header | Type | Description |
+|--------|------|-------------|
+| Site ID | String | Unique site identifier |
+| Sector | String | Sector ID within site |
+| Latitude | Float | Latitude coordinate |
+| Longitude | Float | Longitude coordinate |
+| Dir | Float | Sector azimuth direction (degrees) |
+| tilt | Float | Antenna tilt angle (optional) |
 
-**Contoh data:**
+**Example data:**
 ```csv
 Site ID,Sector,Latitude,Longitude,Dir,tilt
 SITE001,A,-6.2088,106.8456,0,5
@@ -108,48 +108,48 @@ SITE001,B,-6.2088,106.8456,120,5
 SITE001,C,-6.2088,106.8456,240,5
 ```
 
-## 🛠️ Teknologi
+## 🛠️ Technology Stack
 
-- **Python 3.8+**: Bahasa pemrograman utama
-- **DearPyGUI**: Framework GUI modern
-- **NumPy & Pandas**: Manipulasi dan analisis data
-- **SciPy**: Algoritma spatial (Voronoi, BallTree)
-- **Pillow**: Image processing untuk logo
-- **Requests**: HTTP requests untuk download assets
+- **Python 3.8+**: Main programming language
+- **DearPyGUI**: Modern GUI framework
+- **NumPy & Pandas**: Data manipulation and analysis
+- **SciPy**: Spatial algorithms (Voronoi, BallTree)
+- **Pillow**: Image processing for logo
+- **Requests**: HTTP requests for downloading assets
 
-## 📁 Struktur Project
+## 📁 Project Structure
 
 ```
 1st-tier-generator-hd/
 ├── src/
-│   ├── main.py              # Entry point aplikasi
-│   ├── auth.py              # Sistem autentikasi
+│   ├── main.py              # Application entry point
+│   ├── auth.py              # Authentication system
 │   ├── processors/
-│   │   ├── voronoi_processor.py    # Logika Voronoi
-│   │   ├── balltree_processor.py   # Logika BallTree  
-│   │   └── facing_processor.py     # Logika H2H
+│   │   ├── voronoi_processor.py    # Voronoi logic
+│   │   ├── balltree_processor.py   # BallTree logic  
+│   │   └── facing_processor.py     # H2H logic
 │   └── utils/
-│       ├── file_handler.py         # Handler file I/O
-│       └── gui_components.py       # Komponen GUI
+│       ├── file_handler.py         # File I/O handler
+│       └── gui_components.py       # GUI components
 ├── assets/
-│   └── logo.png             # Logo aplikasi
+│   └── logo.png             # Application logo
 ├── docs/
-│   └── user_manual.pdf      # Manual pengguna
+│   └── user_manual.pdf      # User manual
 └── README.md
 ```
 
-## 🚀 Penggunaan
+## 🚀 Usage
 
-1. **Download executable** dari link di atas
-2. **Jalankan aplikasi** - tidak perlu instalasi Python
-3. **Pilih file input** (CSV/Excel) dengan format yang sesuai
-4. **Masukkan Site ID** yang ingin dianalisis (pisahkan dengan koma)
-5. **Atur parameter** sesuai kebutuhan (radius, beam width, dll)
-6. **Pilih metode** analisis di tab yang tersedia
-7. **Klik Proses** dan tunggu hingga selesai
-8. **Hasil otomatis** tersimpan di folder Documents
+1. **Download executable** from the link above
+2. **Run application** - no Python installation required
+3. **Select input file** (CSV/Excel) with proper format
+4. **Enter Site IDs** to analyze (comma-separated)
+5. **Adjust parameters** as needed (radius, beam width, etc.)
+6. **Choose analysis method** from available tabs
+7. **Click Process** and wait for completion
+8. **Results automatically** saved in Documents folder
 
-## 📊 Contoh Output
+## 📊 Sample Output
 
 ### Site Level - Voronoi
 ```csv
@@ -168,17 +168,17 @@ SITE001,B,SITE003,3.12,km
 ### Sector Level - H2H
 ```csv
 Site ID,Sector,1st_Tier,1st_Tier_Sector,H2H_Status,Average of Distance,Distance_Unit
-SITE001,A,SITE002,A,Ya,1.23,km
-SITE001,B,SITE003,C,Tidak,2.45,km
+SITE001,A,SITE002,A,Yes,1.23,km
+SITE001,B,SITE003,C,No,2.45,km
 ```
 
-## 🤝 Kontribusi
+## 🤝 Contributing
 
-Proyek ini dikembangkan untuk komunitas engineer telekomunikasi. Kontribusi dan saran perbaikan sangat diterima.
+This project is developed for the telecommunications engineering community. Contributions and improvement suggestions are welcome.
 
 ## 📞 Support
 
-Jika mengalami kendala atau memiliki pertanyaan:
+If you encounter any issues or have questions:
 - 📧 Email: hadifauzanhanif@gmail.com
 - 💬 WhatsApp: [+62 813-5719-8294](https://wa.me/6281357198294)
 - 💼 LinkedIn: [Hadi Fauzan Hanif](https://www.linkedin.com/in/hadi-fauzan-hanif-0b407b174/)
@@ -192,10 +192,10 @@ Jika mengalami kendala atau memiliki pertanyaan:
 
 ## 📄 License
 
-Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) untuk detail.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
-  <b>⭐ Jika project ini membantu, jangan lupa berikan star! ⭐</b>
+  <b>⭐ If this project helps you, please give it a star! ⭐</b>
 </div> 
