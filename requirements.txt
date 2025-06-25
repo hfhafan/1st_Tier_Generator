@@ -1,0 +1,29 @@
+# Core Dependencies
+pandas>=1.5.0
+numpy>=1.21.0
+scipy>=1.9.0
+
+# Machine Learning & Spatial Analysis
+scikit-learn>=1.1.0
+geopy>=2.2.0
+
+# GUI Framework
+dearpygui>=1.10.0
+
+# Image Processing
+Pillow>=9.0.0
+
+# HTTP Requests
+requests>=2.28.0
+
+# File I/O Support
+openpyxl>=3.0.0  # For Excel file support
+xlrd>=2.0.0      # For legacy Excel support
+
+# Optional Dependencies
+matplotlib>=3.5.0  # For visualization (optional)
+seaborn>=0.11.0    # For advanced plotting (optional)
+
+# Development Dependencies (optional)
+pytest>=7.0.0      # For testing
+black>=22.0.0      # For code formatting 
