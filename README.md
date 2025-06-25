@@ -1,5 +1,5 @@
 # 🎯 1st Tier Generator HD - Multi Method
-
+<img src="https://github.com/user-attachments/assets/1640827f-0a8e-4e78-8812-8fdc455173ca" alt="Logo" width="150"/>
 <div align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-blue.svg" alt="Python Version"/>
   <img src="https://img.shields.io/badge/GUI-DearPyGUI-green.svg" alt="GUI Framework"/>
@@ -12,6 +12,22 @@
 **1st Tier Generator HD** is a desktop application developed for identifying 1st tier sites in telecommunications networks using various spatial analysis methods. This application is specifically designed for telecommunications engineers who need fast and accurate analysis for network optimization.
 
 ## ✨ Key Features
+
+# Preview Apps
+- Site-Level Voronoi method:
+
+  ![image](https://github.com/user-attachments/assets/8219394e-b578-4a93-aa1b-38d224e28db1)
+
+
+- Sector-Level BallTree method:
+
+  ![image](https://github.com/user-attachments/assets/1b1818f5-89e5-4a65-94be-d5ebc4a9416a)
+
+- Sector-Level Head to Head Sector method:
+
+  ![image](https://github.com/user-attachments/assets/401c88e7-2bc8-4ec7-97e1-5404d0d808f0)
+
+
 
 ### 🔄 Multi-Method Analysis
 - **Site Level - Voronoi**: Analysis based on Voronoi diagrams for neighboring site identification
