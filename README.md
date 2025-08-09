@@ -7,6 +7,13 @@
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"/>
 </div>
 
+## ☕ Traktir Kopi
+
+Bantu aku tetap semangat bikin fitur & update baru. Satu cangkir kopi dari kamu = satu langkah fitur berikutnya. 🙌
+
+[![Traktir Kopi di Saweria](https://img.shields.io/badge/click_Untuk_Traktir%20Kopi-Saweria-orange?logo=buymeacoffee&logoColor=white)](https://saweria.co/HDfauzan)
+
+
 ## 📋 Description
 
 **1st Tier Generator HD** is a desktop application developed for identifying 1st tier sites in telecommunications networks using various spatial analysis methods. This application is specifically designed for telecommunications engineers who need fast and accurate analysis for network optimization.
