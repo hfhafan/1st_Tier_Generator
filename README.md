@@ -34,6 +34,10 @@ Bantu aku tetap semangat bikin fitur & update baru. Satu cangkir kopi dari kamu 
 
   ![image](https://github.com/user-attachments/assets/401c88e7-2bc8-4ec7-97e1-5404d0d808f0)
 
+- Voronoi - Base Point input csv method:
+  ![image](https://github.com/user-attachments/assets/eae339f9-0afc-47d9-a2a2-b2a4ec172314)
+
+
 
 
 ### 🔄 Multi-Method Analysis
@@ -109,6 +113,25 @@ def process_facing(sectors, max_radius, beam_width, h2h_threshold):
 - Automatic facing sector detection
 - Head-to-Head analysis with customizable criteria
 - Detailed output including H2H status
+
+### 4. Site Level - Voronoi (Base Point CSV)
+```python
+# Main logic
+def process_voronoi_basepoint(sectors, base_point_csv, max_radius, facing_threshold=45):
+    # 1. Build Voronoi on site centroids (site-level adjacency)
+    # 2. For each base point (lat, lon from CSV):
+    #    - Find nearest site centroid using BallTree
+    #    - Collect Voronoi neighbors of that site
+    # 3. Keep neighbors within max_radius (km)
+    # 4. Pick facing sector on the neighbor site: minimal angle delta ≤ facing_threshold
+    # 5. Return results; optionally export MIF (lines BasePoint → 1st Tier)
+```
+
+**Advantages:**
+- Fast and scalable (Voronoi adjacency + BallTree + vectorized filtering)
+- Adjustable facing threshold (degrees) on the UI
+- Supports base CSV with or without header; tolerant to header name variants
+
 
 ## 📋 Input Data Format
 
